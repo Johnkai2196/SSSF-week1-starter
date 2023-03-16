@@ -32,12 +32,12 @@ describe('GET /api/v1', () => {
     await closePool();
   });
 
-  // test not found
+  // test not found Done
   it('responds with a not found message', async () => {
     await getNotFound(app);
   });
 
-  // test login error
+  // test login error Done
   it('should return error message on invalid credentials', async () => {
     await postAuthLoginError(app);
   });
@@ -45,6 +45,7 @@ describe('GET /api/v1', () => {
   // test create user
   let token: string = '';
   let user: UserWithToken;
+
   it('should create a new user', async () => {
     user = await postUser(app, {
       user_name: 'Test User ' + new Date().toLocaleDateString('fi-FI'),
@@ -53,7 +54,7 @@ describe('GET /api/v1', () => {
     });
   });
 
-  // test login
+  // test login Done
   it('should return a user object and bearer token on valid credentials', async () => {
     const user = await postAuthLogin(app, {
       username: 'test@user.fi',
@@ -62,7 +63,7 @@ describe('GET /api/v1', () => {
     token = user.token;
   });
 
-  // test get all users
+  // test get all users Done
   let userId = 0;
   it('should return array of users', async () => {
     const users: User[] = await getUser(app);
