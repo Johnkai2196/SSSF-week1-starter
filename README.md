@@ -56,7 +56,7 @@ The tables are updated a little from 2nd year example.
 - _Do not change or delete admin user_
 
 ### Run this SQL in your database:
-
+```sql
 CREATE TABLE `sssf_cat` (
   `cat_id` int(11) NOT NULL,
   `cat_name` text NOT NULL,
