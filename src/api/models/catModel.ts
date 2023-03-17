@@ -47,7 +47,7 @@ const getCat = async (catId: string): Promise<Cat> => {
   return cat;
 };
 
-const addCat = async (data: PostCat, user_id: number): Promise<number> => {
+const addCat = async (data: PostCat): Promise<number> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
     `
     INSERT INTO sssf_cat (cat_name, weight, owner, filename, birthdate, coords) 
@@ -56,14 +56,13 @@ const addCat = async (data: PostCat, user_id: number): Promise<number> => {
     [
       data.cat_name,
       data.weight,
-      user_id,
+      data.owner,
       data.filename,
       data.birthdate,
       data.lat,
       data.lng,
     ]
   );
-
   if (headers.affectedRows === 0) {
     throw new CustomError('No cats added', 400);
   }

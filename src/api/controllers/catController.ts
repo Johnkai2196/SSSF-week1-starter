@@ -65,7 +65,8 @@ const catPost = async (req: Request, res: Response, next: NextFunction) => {
     cat.filename = <string>req.file?.filename;
     cat.lat = res.locals.coords[0];
     cat.lng = res.locals.coords[1];
-    const result = await addCat(cat, (req.user as User).user_id);
+    cat.owner = (req.user as User).user_id;
+    const result = await addCat(cat);
     if (result) {
       const message: MessageResponse = {
         message: 'cat added',
