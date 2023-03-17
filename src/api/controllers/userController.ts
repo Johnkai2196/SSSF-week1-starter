@@ -35,13 +35,11 @@ const userGet = async (
   }
 };
 
-// TODO: create userPost function to add new user
+// TODO: create userPost function to add new user Done
 // userPost should use addUser function from userModel
 // userPost should use validationResult to validate req.body
 // userPost should use bcrypt to hash password
 // userPost should use salt from above
-
-// ask ilkka about this
 const userPost = async (
   req: Request<{}, {}, User>,
   res: Response,
@@ -93,7 +91,7 @@ const userPut = async (
   }
 };
 
-// TODO: create userPutCurrent function to update current user
+// TODO: create userPutCurrent function to update current user Done
 // userPutCurrent should use updateUser function from userModel
 // userPutCurrent should use validationResult to validate req.body
 // userPutCurrent should use bcrypt to hash password
@@ -117,7 +115,7 @@ const userPutCurrent = async (
   }
 };
 
-// TODO: create userDelete function for admin to delete user by id
+// TODO: create userDelete function for admin to delete user by id Done
 // userDelete should use deleteUser function from userModel
 // userDelete should use validationResult to validate req.params.id
 // userDelete should use req.user to get role

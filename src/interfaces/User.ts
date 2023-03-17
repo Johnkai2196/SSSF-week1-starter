@@ -13,6 +13,5 @@ interface GetUser extends RowDataPacket, User {}
 // TODO create interface PostUser that extends User but without id. Done
 type PostUser = Omit<User, 'user_id'>;
 // TODO create interface PutUser that extends PostUser but all properties are optional. Done
-// type PutUser = Partial<PostUser>;
-interface PutUser extends Partial<PostUser> {}
+type PutUser = Partial<PostUser>;
 export {User, GetUser, PostUser, PutUser};

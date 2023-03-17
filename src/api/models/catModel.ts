@@ -2,7 +2,6 @@ import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
 import {Cat, GetCat, PostCat, PutCat} from '../../interfaces/Cat';
-import {User} from '../../interfaces/User';
 
 const getAllCats = async (): Promise<Cat[]> => {
   const [rows] = await promisePool.execute<GetCat[]>(
@@ -48,10 +47,7 @@ const getCat = async (catId: string): Promise<Cat> => {
   return cat;
 };
 
-const addCat = async (
-  data: PostCat,
-  filename: string | undefined
-): Promise<number> => {
+const addCat = async (data: PostCat, user_id: number): Promise<number> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
     `
     INSERT INTO sssf_cat (cat_name, weight, owner, filename, birthdate, coords) 
@@ -60,13 +56,14 @@ const addCat = async (
     [
       data.cat_name,
       data.weight,
-      data.owner,
-      filename,
+      user_id,
+      data.filename,
       data.birthdate,
       data.lat,
       data.lng,
     ]
   );
+
   if (headers.affectedRows === 0) {
     throw new CustomError('No cats added', 400);
   }
@@ -83,25 +80,15 @@ const updateCat = async (
   user_id: number,
   user_role: string
 ): Promise<boolean> => {
-  let query = `
-    UPDATE sssf_cat 
-    SET cat_name = ?, weight = ?, filename = ?, birthdate = ?, coords = POINT(?, ?)
-    WHERE cat_id = ?`;
+  let query = `UPDATE sssf_cat SET ? WHERE cat_id = ? AND owner = ?`;
+  let params = [data, cat_id, user_id];
 
   if (user_role === 'admin') {
-    query += ' AND owner = ?';
+    query = `UPDATE sssf_cat SET ? WHERE cat_id = ? `;
+    params = [data, cat_id];
   }
-
-  const [headers] = await promisePool.execute<ResultSetHeader>(query, [
-    data.cat_name,
-    data.weight,
-    data.filename,
-    data.birthdate,
-    data.lat,
-    data.lng,
-    user_role === 'admin' ? user_id : data.owner,
-    data.cat_id,
-  ]);
+  const sql = promisePool.format(query, params);
+  const [headers] = await promisePool.execute<ResultSetHeader>(sql);
   if (headers.affectedRows === 0) {
     throw new CustomError('No cats updated', 400);
   }
@@ -122,27 +109,4 @@ const deleteCat = async (catId: number): Promise<boolean> => {
   return true;
 };
 
-//get cat by user id
-const getCatsByUserId = async (userId: number): Promise<Cat[]> => {
-  const [rows] = await promisePool.execute<GetCat[]>(
-    `
-    SELECT cat_id, cat_name, weight, filename, birthdate, ST_X(coords) as lat, ST_Y(coords) as lng,
-    JSON_OBJECT('user_id', sssf_user.user_id, 'user_name', sssf_user.user_name) AS owner 
-    FROM sssf_cat 
-    JOIN sssf_user 
-    ON sssf_cat.owner = sssf_user.user_id
-    WHERE owner = ?
-    `,
-    [userId]
-  );
-  if (rows.length === 0) {
-    throw new CustomError('No cats found', 404);
-  }
-  const cats: Cat[] = rows.map((row) => ({
-    ...row,
-    owner: JSON.parse(row.owner?.toString() || '{}'),
-  }));
-
-  return cats;
-};
-export {getAllCats, getCat, addCat, updateCat, deleteCat, getCatsByUserId};
+export {getAllCats, getCat, addCat, updateCat, deleteCat};
